@@ -1,0 +1,182 @@
+name: Version release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: '25'
+          elixir-version: '1.13.4'
+
+      - uses: actions/cache@v1
+        with:
+          path: _build
+          key: v1-${{ runner.os }}-build-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+          restore-keys: |
+            v1-${{ runner.os }}-build-
+
+      - uses: actions/cache@v1
+        with:
+          path: deps
+          key: v1-${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+          restore-keys: |
+            v1-${{ runner.os }}-mix-
+
+      - name: Fetch Dependencies
+        run: mix deps.get
+
+      - name: Compile
+        run: mix compile --warnings-as-errors
+
+  code_format:
+    runs-on: ubuntu-22.04
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: '25'
+          elixir-version: '1.13.4'
+
+      - uses: actions/cache@v1
+        with:
+          path: _build
+          key: v1-${{ runner.os }}-build-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+          restore-keys: |
+            v1-${{ runner.os }}-build-
+
+      - uses: actions/cache@v1
+        with:
+          path: deps
+          key: v1-${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+          restore-keys: |
+            v1-${{ runner.os }}-mix-
+
+      - uses: actions/cache@v1
+        id: plt-cache
+        with:
+          path: priv/plts
+          key: v1-${{ runner.os }}-plts-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+
+      - name: Formatter Analysis
+        run: mix format --check-formatted
+
+      - name: Credo Analysis
+        run: mix credo
+
+      - name: Dialyzer Analysis
+        run: mix dialyzer --no-check --halt-exit-status
+
+  code_verification:
+    runs-on: ubuntu-22.04
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: '25'
+          elixir-version: '1.13.4'
+
+      - uses: actions/cache@v1
+        with:
+          path: _build
+          key: v1-${{ runner.os }}-build-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+          restore-keys: |
+            v1-${{ runner.os }}-build-
+
+      - uses: actions/cache@v1
+        with:
+          path: deps
+          key: v1-${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+          restore-keys: |
+            v1-${{ runner.os }}-mix-
+
+      - uses: actions/cache@v1
+        id: plt-cache
+        with:
+          path: priv/plts
+          key: v1-${{ runner.os }}-plts-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+
+      - name: Create PLTs
+        if: steps.plt-cache.outputs.cache-hit != 'true'
+        run: mix dialyzer --plt
+
+      - name: Dialyzer Analysis
+        run: mix dialyzer --no-check --halt-exit-status
+
+  test:
+    runs-on: ubuntu-22.04
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: '25'
+          elixir-version: '1.13.4'
+
+      - uses: actions/cache@v1
+        with:
+          path: _build
+          key: v1-${{ runner.os }}-build-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+          restore-keys: |
+            v1-${{ runner.os }}-build-
+
+      - uses: actions/cache@v1
+        with:
+          path: deps
+          key: v1-${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+          restore-keys: |
+            v1-${{ runner.os }}-mix-
+
+      - name: Run Tests
+        run: mix coveralls
+
+  release:
+    name: release
+    runs-on: ubuntu-22.04
+    needs:
+      - code_format
+      - code_verification
+      - test
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: Get application version
+      id: app_version
+      run: |
+        APP_VERSION=$(cat "mix.exs" | grep version | sed -e 's/.*version: "\(.*\)",/\1/')
+        echo "::set-output name=app_version::$APP_VERSION"
+
+    - name: Check version in use
+      env:
+        APP_VERSION: ${{ steps.app_version.outputs.app_version }}
+      run: |
+        echo "Checking $APP_VERSION availability"
+        GIT_TAG_VERSION=$(echo "v$APP_VERSION")
+
+        if git tag --list | grep -i "$GIT_TAG_VERSION"; then
+          echo "Version $GIT_TAG_VERSION is already is use"
+          exit 1
+        fi
+
+    - uses: rickstaa/action-create-tag@v1
+      with:
+        tag: v${{ steps.app_version.outputs.app_version }}
+        message: "New tag created v${{ steps.app_version.outputs.app_version }}"
