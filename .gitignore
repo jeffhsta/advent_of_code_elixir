@@ -25,4 +25,7 @@ advent_of_code-*.tar
 # Temporary files, for example, from tests.
 /tmp/
 
-/priv/plts
+# Ignore dialyzer plt file
+*.plt
+*.plt.hash
+
