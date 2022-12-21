@@ -45,5 +45,20 @@ defmodule AdventOfCode.Day1Test do
 
       assert Day1.solve(input) == {:ok, 2, 3500}
     end
+
+    test "returns the Elf 1 and calories 4000" do
+      input = """
+      1000
+      700
+
+      1100
+      1000
+      1900
+
+      3500
+      """
+
+      assert Day1.solve(input) == {:ok, 1, 4000}
+    end
   end
 end
