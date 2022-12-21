@@ -13,7 +13,7 @@ defmodule AdventOfCode do
   ## Examples
 
     iex> AdventOfCode.day1()
-    {:ok, 3, 24000}
+    {:ok, 188, 68775}
   """
   @spec day1 :: {:ok, integer(), integer()}
   def day1 do
