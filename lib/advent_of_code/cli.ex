@@ -18,12 +18,12 @@ defmodule AdventOfCode.CLI do
 
   def parse_args([year]) do
     with {:ok, year} <- parse_year(year) do
-      {:ok, %AppArgs{years: [year], days: @days_range}}
+      {:ok, %AppArgs{years: [year], days: Enum.to_list(@days_range)}}
     end
   end
 
   def parse_args([]) do
-    {:ok, %AppArgs{years: @years_range, days: @days_range}}
+    {:ok, %AppArgs{years: Enum.to_list(@years_range), days: Enum.to_list(@days_range)}}
   end
 
   def parse_args(_args) do

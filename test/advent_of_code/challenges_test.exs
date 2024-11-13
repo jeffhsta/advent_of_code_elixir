@@ -5,6 +5,7 @@ defmodule AdventOfCode.ChallengesTest do
   alias AdventOfCode.AppArgs
 
   describe "process/1" do
+    @tag :debug
     test "returns :ok when processing all challenges" do
       args = %AppArgs{years: [1], days: [1]}
 
@@ -17,7 +18,6 @@ defmodule AdventOfCode.ChallengesTest do
       assert log_output =~ "--- Day 1 ---"
       assert log_output =~ "Part 1: 0"
       assert log_output =~ "Part 2: 0"
-      assert log_output =~ "----------------------------"
       assert log_output =~ "##########################"
     end
 
@@ -32,7 +32,20 @@ defmodule AdventOfCode.ChallengesTest do
       assert log_output =~ "## Year 1 ##"
       assert log_output =~ "--- Day 2 ---"
       assert log_output =~ "input_file_not_accessible"
-      assert log_output =~ "----------------------------"
+      assert log_output =~ "##########################"
+    end
+
+    test "returns :ok and log not implemented for challenges not implemented yet" do
+      args = %AppArgs{years: [1], days: [3]}
+
+      log_output =
+        ExUnit.CaptureLog.capture_log(fn ->
+          assert Challenges.process(args) == :ok
+        end)
+
+      assert log_output =~ "## Year 1 ##"
+      assert log_output =~ "--- Day 3 ---"
+      assert log_output =~ "Not implemented!"
       assert log_output =~ "##########################"
     end
   end

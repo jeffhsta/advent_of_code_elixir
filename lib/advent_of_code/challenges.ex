@@ -13,21 +13,30 @@ defmodule AdventOfCode.Challenges do
 
   @spec process(AppArgs.t()) :: :ok
   def process(args) do
+    implemented_challenges =
+      :advent_of_code
+      |> :application.get_key(:modules)
+      |> elem(1)
+      |> Enum.filter(&String.starts_with?("#{&1}", "Elixir.AdventOfCode.Challenges.Year"))
+      |> Enum.map(&String.replace("#{&1}", "Elixir.AdventOfCode.Challenges.", ""))
+
     Enum.each(args.years, fn year ->
       Logger.info("## Year #{year} ##")
-
-      Enum.each(args.days, fn day ->
-        Logger.info("--- Day #{day} ---")
-
-        year
-        |> solve_challenge(day)
-        |> print_result()
-
-        Logger.info("----------------------------")
-      end)
-
+      Enum.each(args.days, &process_day_challenge(&1, year, implemented_challenges))
       Logger.info("##########################")
     end)
+  end
+
+  defp process_day_challenge(day, year, implemented_challenges) do
+    Logger.info("--- Day #{day} ---")
+
+    if Enum.member?(implemented_challenges, "Year#{year}.Day#{day}") do
+      year
+      |> solve_challenge(day)
+      |> print_result()
+    else
+      Logger.info("Not implemented!")
+    end
   end
 
   defp solve_challenge(year, day) do

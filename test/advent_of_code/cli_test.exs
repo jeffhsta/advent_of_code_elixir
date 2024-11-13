@@ -10,11 +10,12 @@ defmodule AdventOfCode.CLITest do
     end
 
     test "returns parsed args with year and all days when passing only year as argument" do
-      assert CLI.parse_args(["2015"]) == {:ok, %AppArgs{years: [2015], days: 1..25}}
+      assert CLI.parse_args(["2015"]) == {:ok, %AppArgs{years: [2015], days: Enum.to_list(1..25)}}
     end
 
     test "returns parsed args with all years and all days when passing no arguments" do
-      assert CLI.parse_args([]) == {:ok, %AppArgs{years: 2015..2024, days: 1..25}}
+      assert CLI.parse_args([]) ==
+               {:ok, %AppArgs{years: Enum.to_list(2015..2024), days: Enum.to_list(1..25)}}
     end
 
     test "returns an error when passing wrong number or arguments" do
