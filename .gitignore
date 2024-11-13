@@ -28,4 +28,8 @@ advent_of_code-*.tar
 # Ignore dialyzer plt file
 *.plt
 *.plt.hash
+priv/plts/*
+!priv/plts
 
+# The project binary file
+advent_of_code

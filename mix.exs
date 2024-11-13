@@ -11,7 +11,7 @@ defmodule AdventOfCode.MixProject do
       deps: deps(),
       aliases: aliases(),
       dialyzer: [plt_file: {:no_warn, "priv/plts/dialyzer.plt"}],
-      test_coverage: [tool: ExCoveralls],
+      test_coverage: [tool: ExCoveralls, export: "cov"],
       escript: escript_config(),
       preferred_cli_env: [
         coveralls: :test,
@@ -36,7 +36,7 @@ defmodule AdventOfCode.MixProject do
   defp deps do
     [
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
-      {:excoveralls, "~> 0.15.1", only: [:dev, :test]},
+      {:excoveralls, "~> 0.18.3", only: [:test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev], runtime: false}
     ]
   end
@@ -51,7 +51,7 @@ defmodule AdventOfCode.MixProject do
       ],
       build: ["escript.build"],
       exec: ["run -e \"AdventOfCode.main()\""],
-      test: ["test --cover"],
+      test: ["coveralls.html"],
       credo: ["credo --strict"]
     ]
   end

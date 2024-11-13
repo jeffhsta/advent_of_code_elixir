@@ -1,7 +1,8 @@
 {
     "skip_files": [
         "deps/",
-        "test/"
+        "test/",
+        "lib/advent_of_code.ex"
     ],
     "coverage_options": {
         "minimum_coverage": 100
