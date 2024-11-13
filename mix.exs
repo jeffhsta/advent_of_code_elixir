@@ -4,13 +4,15 @@ defmodule AdventOfCode.MixProject do
   def project do
     [
       app: :advent_of_code,
-      version: "0.2.0",
-      elixir: "~> 1.13",
+      version: "0.1.0",
+      elixir: "~> 1.17",
+      elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       aliases: aliases(),
       dialyzer: [plt_file: {:no_warn, "priv/plts/dialyzer.plt"}],
       test_coverage: [tool: ExCoveralls],
+      escript: escript_config(),
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.detail": :test,
@@ -26,11 +28,16 @@ defmodule AdventOfCode.MixProject do
     ]
   end
 
+  defp escript_config(), do: [main_module: AdventOfCode]
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
+
   defp deps do
     [
-      {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.2", only: [:dev], runtime: false},
-      {:excoveralls, "~> 0.15.1", only: [:dev, :test]}
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:excoveralls, "~> 0.15.1", only: [:dev, :test]},
+      {:dialyxir, "~> 1.4", only: [:dev], runtime: false}
     ]
   end
 
@@ -41,7 +48,11 @@ defmodule AdventOfCode.MixProject do
         "format --check-formatted",
         "credo",
         "dialyzer"
-      ]
+      ],
+      build: ["escript.build"],
+      exec: ["run -e \"AdventOfCode.main()\""],
+      test: ["test --cover"],
+      credo: ["credo --strict"]
     ]
   end
 end
