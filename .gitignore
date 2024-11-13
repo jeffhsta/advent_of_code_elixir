@@ -30,6 +30,3 @@ advent_of_code-*.tar
 *.plt.hash
 priv/plts/*
 !priv/plts
-
-# The project binary file
-advent_of_code

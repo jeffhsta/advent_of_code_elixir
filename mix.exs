@@ -51,7 +51,6 @@ defmodule AdventOfCode.MixProject do
       ],
       build: ["escript.build"],
       exec: ["run -e \"AdventOfCode.main()\""],
-      test: ["coveralls.html"],
       credo: ["credo --strict"]
     ]
   end

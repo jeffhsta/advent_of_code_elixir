@@ -3,29 +3,29 @@ defmodule AdventOfCode do
   AdventOfCode root module
   """
 
-  @application :advent_of_code
-  @input_files_path "priv/input_files"
-  @day1_input_file "day1.txt"
+  alias AdventOfCode.Challenges
+  alias AdventOfCode.CLI
 
-  @doc ~S"""
-  This function uses the input to solve day 1 challenge
+  require Logger
 
-  ## Examples
+  def main(args \\ System.argv()) do
+    with {:ok, parsed_args} <- CLI.parse_args(args) do
+      Logger.info("Starting Advent of Code...")
 
-    iex> AdventOfCode.day1()
-    {:ok, 188, 68775}
-  """
-  @spec day1 :: {:ok, integer(), integer()}
-  def day1 do
-    @day1_input_file
-    |> load_input_file_content()
-    |> __MODULE__.Day1.solve()
-  end
+      cond do
+        length(parsed_args.years) > 1 ->
+          Logger.info("Processing all years")
 
-  defp load_input_file_content(filename) do
-    filename
-    |> then(& Path.join(@input_files_path, &1))
-    |> then(& Application.app_dir(@application, &1))
-    |> File.read!()
+        length(parsed_args.days) > 1 ->
+          Logger.info("Processing year #{List.first(parsed_args.years)} all days")
+
+        true ->
+          Logger.info(
+            "Processing year #{List.first(parsed_args.years)} day #{List.first(parsed_args.days)}"
+          )
+      end
+
+      Challenges.process(parsed_args)
+    end
   end
 end
