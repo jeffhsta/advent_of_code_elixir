@@ -20,8 +20,16 @@ defmodule AdventOfCode.Challenges.Year2015.Day1Test do
   end
 
   describe "solve_part2/1" do
-    test "returns zero value", %{input: input} do
-      assert Day1.solve_part2(input) == {:ok, 0}
+    test "returns first basement entry index as 1" do
+      input = ")"
+
+      assert Day1.solve_part2(input) == {:ok, 1}
+    end
+
+    test "returns first basement entry index as 5" do
+      input = "()())"
+
+      assert Day1.solve_part2(input) == {:ok, 5}
     end
   end
 end
