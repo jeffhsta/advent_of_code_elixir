@@ -8,7 +8,15 @@ defmodule AdventOfCode.CLI do
   @years_range 2015..2024
   @days_range 1..25
 
-  @spec parse_args([String.t()]) :: {:ok, AppArgs.t()} | term()
+  @spec parse_args([String.t()]) ::
+          {:ok, AppArgs.t()}
+          | {:error,
+             :need_to_specify_year
+             | :invalid_number_of_arguments
+             | :year_argument_out_of_range
+             | :day_argument_out_of_range
+             | :invalid_year_argument
+             | :invalid_day_argument}
   def parse_args([year, day]) do
     with {:ok, year} <- parse_year(year),
          {:ok, day} <- parse_day(day) do
@@ -23,7 +31,7 @@ defmodule AdventOfCode.CLI do
   end
 
   def parse_args([]) do
-    {:ok, %AppArgs{years: Enum.to_list(@years_range), days: Enum.to_list(@days_range)}}
+    {:error, :need_to_specify_year}
   end
 
   def parse_args(_args) do
