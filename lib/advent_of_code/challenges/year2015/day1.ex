@@ -6,12 +6,21 @@ defmodule AdventOfCode.Challenges.Year2015.Day1 do
   @behaviour AdventOfCode.Challenges.Behavior
 
   @impl true
-  def solve_part1(_input) do
-    {:ok, 0}
+  def solve_part1(input) do
+    final_floor =
+      input
+      |> String.split("")
+      |> Enum.reduce(0, &up_or_down_floors/2)
+
+    {:ok, final_floor}
   end
 
   @impl true
   def solve_part2(_input) do
     {:ok, 0}
   end
+
+  defp up_or_down_floors("(", floor), do: floor + 1
+  defp up_or_down_floors(")", floor), do: floor - 1
+  defp up_or_down_floors(_char, floor), do: floor
 end
