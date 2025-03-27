@@ -12,7 +12,7 @@ defmodule AdventOfCode.Challenges do
                     |> Keyword.fetch!(:input_files_path)
 
   @spec process(AppArgs.t()) :: :ok
-  def process(args) do
+  def process(%{years: [year]} = args) do
     implemented_challenges =
       :advent_of_code
       |> :application.get_key(:modules)
@@ -20,11 +20,8 @@ defmodule AdventOfCode.Challenges do
       |> Enum.filter(&String.starts_with?("#{&1}", "Elixir.AdventOfCode.Challenges.Year"))
       |> Enum.map(&String.replace("#{&1}", "Elixir.AdventOfCode.Challenges.", ""))
 
-    Enum.each(args.years, fn year ->
-      Logger.info("## Year #{year} ##")
-      Enum.each(args.days, &process_day_challenge(&1, year, implemented_challenges))
-      Logger.info("##########################")
-    end)
+    Logger.info("## Year #{year} ##")
+    Enum.each(args.days, &process_day_challenge(&1, year, implemented_challenges))
   end
 
   defp process_day_challenge(day, year, implemented_challenges) do
